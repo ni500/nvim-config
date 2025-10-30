@@ -27,9 +27,6 @@ keymap('n', '+', '<cmd>foldopen<CR>', { desc = 'Open code fold' })
 keymap('n', '<C-s>', ':w<CR>', opts) -- Save (Ctrl+S)
 keymap('i', '<C-s>', '<Esc>:w<CR>a', opts) -- Save in insert mode
 
--- CLAUDE CODE
-keymap('n', '<leader>c', '<cmd>ClaudeCode<CR>', { desc = 'Toggle Claude Code' })
-
 -- Cusom keymaps for Nicolass-Mac-Studio
 keymap('n', ',', '$', { desc = 'Move to end of line' })
 keymap('n', 'n', '0', { desc = 'Move to start of line' })
