@@ -22,56 +22,7 @@
 
 --]]
 
--- VIM OPTIONS
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
-vim.g.have_nerd_font = true
-vim.o.number = true
-vim.o.mouse = 'a'
-vim.o.showmode = false
-vim.o.tabstop = 2
-vim.o.expandtab = true
-vim.schedule(function()
-  vim.o.clipboard = 'unnamedplus'
-end)
-vim.o.breakindent = true
-vim.o.undofile = true
-vim.o.ignorecase = true
-vim.o.smartcase = true
-vim.o.signcolumn = 'yes'
-vim.o.updatetime = 250
-vim.o.timeoutlen = 300
-vim.o.splitright = true
-vim.o.splitbelow = true
-vim.o.list = true
-vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
-vim.o.inccommand = 'split'
-vim.o.cursorline = true
-vim.o.scrolloff = 10
-vim.o.confirm = true
 require('custom.config.options')
-
--- MAIN KEYMAPS
-vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
-vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
--- WARNING: Disable arrow keys in normal mode for advanced level practicing
-vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
-vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
-vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
-vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
--- Keybinds to make split navigation easier.
-vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
-vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
--- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
---
--- vim.keymap.set('n', '<C-S-h>', '<C-w>H', { desc = 'Move window to the left' })
--- vim.keymap.set('n', '<C-S-l>', '<C-w>L', { desc = 'Move window to the right' })
--- vim.keymap.set('n', '<C-S-j>', '<C-w>J', { desc = 'Move window to the lower' })
--- vim.keymap.set('n', '<C-S-k>', '<C-w>K', { desc = 'Move window to the upper' })
-
 require('custom.config.keymaps')
 
 vim.api.nvim_create_autocmd('TextYankPost', {
@@ -95,7 +46,7 @@ local rtp = vim.opt.rtp
 rtp:prepend(lazypath)
 require('lazy').setup({
   'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
-  { -- Adds git related signs to the gutter, as well as utilities for managing changes
+  { -- getsigns: Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
     opts = {
       signs = {
@@ -117,7 +68,7 @@ require('lazy').setup({
       vim.api.nvim_set_hl(0, 'GitSignsUntracked', { fg = '#5E5C64' })
     end,
   },
-  { -- Useful plugin to show you pending keybinds.
+  { -- whick-key: Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
     opts = {
@@ -133,7 +84,7 @@ require('lazy').setup({
       },
     },
   },
-  { -- Fuzzy Finder (files, lsp, etc)
+  { -- telescope: Fuzzy Finder (files, lsp, etc)
     'nvim-telescope/telescope.nvim',
     event = 'VimEnter',
     dependencies = {
@@ -185,39 +136,12 @@ require('lazy').setup({
       -- Enable Telescope extensions if they are installed
       pcall(require('telescope').load_extension, 'fzf')
       pcall(require('telescope').load_extension, 'ui-select')
-      -- See `:help telescope.builtin`
-      local builtin = require('telescope.builtin')
-      vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
-      vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
-      vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
-      vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
-      vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
-      vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
-      vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
-      vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
-      vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
-      -- vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
-      -- Slightly advanced example of overriding default behavior and theme
-      --vim.keymap.set('n', '<leader>/', function()
-      --builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown({
-      --winblend = 10,
-      --previewer = false,
-      --}))
-      -- end, { desc = '[/] Fuzzily search in current buffer' })
-      vim.keymap.set('n', '<leader>s/', function()
-        builtin.live_grep({
-          grep_open_files = true,
-          prompt_title = 'Live Grep in Open Files',
-        })
-      end, { desc = '[S]earch [/] in Open Files' })
-      -- Shortcut for searching your Neovim configuration files
-      vim.keymap.set('n', '<leader>sn', function()
-        builtin.find_files({ cwd = vim.fn.stdpath('config') })
-      end, { desc = '[S]earch [N]eovim files' })
+      -- NOTE: Telescope search keymaps removed - using Snacks.picker instead
+      -- All search functionality now handled by Snacks.picker (see lua/custom/plugins/snacks.lua)
     end,
   },
   -- LSP Plugins
-  {
+  { -- lazydev
     'folke/lazydev.nvim',
     ft = 'lua',
     opts = {
@@ -227,8 +151,7 @@ require('lazy').setup({
       },
     },
   },
-  {
-    -- Main LSP Configuration
+  { -- nvim-lspconfig: Main LSP Configuration
     'neovim/nvim-lspconfig',
     dependencies = {
       -- Mason must be loaded before its dependents so we need to set it up here.
@@ -251,20 +174,11 @@ require('lazy').setup({
           -- Execute a code action, usually your cursor needs to be on top of an error
           -- or a suggestion from your LSP for this to activate.
           map('gra', vim.lsp.buf.code_action, '[G]oto Code [A]ction', { 'n', 'x' })
-          -- Find references for the word under your cursor.
-          map('grr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
-          -- Jump to the implementation of the word under your cursor.
-          map('gri', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
-          -- Jump to the definition of the word under your cursor.
-          map('grd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
           -- This is not Goto Definition, this is Goto Declaration.
           map('grD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
-          -- Fuzzy find all the variables, functions, types, etc. in your current document.
-          map('gO', require('telescope.builtin').lsp_document_symbols, 'Open Document Symbols')
-          --  Similar to document symbols, except searches over your entire project.
-          map('gW', require('telescope.builtin').lsp_dynamic_workspace_symbols, 'Open Workspace Symbols')
-          -- Jump to the type of the word under your cursor.
-          map('grt', require('telescope.builtin').lsp_type_definitions, '[G]oto [T]ype Definition')
+          -- NOTE: Telescope LSP navigation keymaps removed - using Snacks.picker instead
+          -- LSP navigation now handled by Snacks.picker (gd, gr, gI, gD, gy)
+          -- See lua/custom/plugins/snacks.lua for LSP keymaps
 
           -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
           ---@param client vim.lsp.Client
@@ -383,7 +297,7 @@ require('lazy').setup({
       })
     end,
   },
-  { -- Autoformat
+  { -- conform: Autoformat
     'stevearc/conform.nvim',
     event = { 'BufReadPre', 'BufNewFile' },
     cmd = { 'ConformInfo' },
@@ -415,7 +329,7 @@ require('lazy').setup({
       },
     },
   },
-  { -- Autocompletion
+  { -- blink: Autocompletion
     'saghen/blink.cmp',
     event = 'VimEnter',
     version = '1.*',
@@ -464,7 +378,7 @@ require('lazy').setup({
       signature = { enabled = true },
     },
   },
-  { -- You can easily change to a different colorscheme. `:Telescope colorscheme`
+  { -- tokyotonight: You can easily change to a different colorscheme. `:Telescope colorscheme`
     'folke/tokyonight.nvim',
     priority = 1000, -- Make sure to load this before all the other start plugins.
     config = function()
@@ -477,26 +391,19 @@ require('lazy').setup({
       vim.cmd.colorscheme('tokyonight-storm')
     end,
   },
-  {
+  { -- todo-comments: Highlight, edit, and navigate code
     'folke/todo-comments.nvim',
     event = 'VimEnter',
     dependencies = { 'nvim-lua/plenary.nvim' },
     opts = { signs = false },
   },
-  { -- Collection of various small independent plugins/modules
+  { -- mini: Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
     config = function()
       require('mini.ai').setup({ n_lines = 500 })
-      require('mini.surround').setup()
-      local statusline = require('mini.statusline')
-      statusline.setup({ use_icons = vim.g.have_nerd_font })
-      ---@diagnostic disable-next-line: duplicate-set-field
-      statusline.section_location = function()
-        return '%2l:%-2v'
-      end
     end,
   },
-  { -- Highlight, edit, and navigate code
+  { -- treesitter: Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
@@ -520,6 +427,9 @@ require('lazy').setup({
         'typst',
         'vue',
         'regex',
+        'css',
+        'scss',
+        'tsx',
       },
       auto_install = true,
       highlight = {
@@ -530,7 +440,6 @@ require('lazy').setup({
     },
   },
   require('kickstart.plugins.debug'),
-  require('kickstart.plugins.indent_line'),
   require('kickstart.plugins.lint'),
   require('kickstart.plugins.autopairs'),
   require('kickstart.plugins.gitsigns'), -- adds gitsigns recommend keymaps
