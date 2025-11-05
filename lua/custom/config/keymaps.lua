@@ -59,3 +59,20 @@ end, { desc = '[A]ngular: Toggle [C]omponent/Template' })
 keymap('n', '<leader>aG', function()
   Snacks.picker.grep_word()
 end, { desc = '[A]ngular: [G]rep word under cursor' })
+
+-- macOS-style text editing keybindings for insert mode (configured in Ghostty)
+-- Cmd + Arrow keys (line navigation)
+keymap('i', '<C-Right>', '<End>', { desc = 'Go to end of line' })
+keymap('i', '<C-Home>', '<Home>', { desc = 'Go to start of line' })
+
+-- Cmd + Shift + Arrow keys (line selection)
+keymap('i', '<C-S-Right>', '<Esc>v$', { desc = 'Select to end of line' })
+keymap('i', '<C-S-Left>', '<Esc>v0', { desc = 'Select to start of line' })
+
+-- Option + Arrow keys (word navigation) - using emacs-style sequences
+keymap('i', '<M-f>', '<C-o>w', { desc = 'Go forward one word' })
+keymap('i', '<M-b>', '<C-o>b', { desc = 'Go back one word' })
+
+-- Option + Shift + Arrow keys (word selection)
+keymap('i', '<M-S-Right>', '<Esc>vw', { desc = 'Select forward one word' })
+keymap('i', '<M-S-Left>', '<Esc>vb', { desc = 'Select back one word' })
