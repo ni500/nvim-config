@@ -122,20 +122,34 @@ require('lazy').setup({
           },
         },
       },
+      { 'kkharji/sqlite.lua' },
+      { 'nvim-telescope/telescope-frecency.nvim' },
     },
     config = function()
       -- [[ Configure Telescope ]]
       -- See `:help telescope` and `:help telescope.setup()`
       require('telescope').setup({
+        defaults = {
+          layout_config = {
+            prompt_position = 'top',
+          },
+          sorting_strategy = 'ascending', -- Results flow down from top
+        },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
+          },
+          frecency = {
+            auto_validate = false,
+            matcher = 'fuzzy',
+            path_display = { 'filename_first' },
           },
         },
       })
       -- Enable Telescope extensions if they are installed
       pcall(require('telescope').load_extension, 'fzf')
       pcall(require('telescope').load_extension, 'ui-select')
+
       -- NOTE: Telescope search keymaps removed - using Snacks.picker instead
       -- All search functionality now handled by Snacks.picker (see lua/custom/plugins/snacks.lua)
     end,
