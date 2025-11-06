@@ -9,37 +9,44 @@ return {
       dashboard = {
         enabled = true,
         preset = {
-          keys = {
-            { icon = '󰈞 ', key = 'f', desc = 'Find Files (Frecency)', action = ':Telescope frecency workspace=CWD, path_display=shorten' },
-            { icon = '󰈔 ', key = 'n', desc = 'New File', action = ':ene | startinsert' },
-            {
-              icon = '󰱼 ',
-              key = 'g',
-              desc = 'Find Text',
-              action = function()
-                Snacks.picker.grep()
-              end,
-            },
-            {
-              icon = '󰋚 ',
-              key = 'r',
-              desc = 'Recent Files',
-              action = function()
-                Snacks.picker.recent()
-              end,
-            },
-            {
-              icon = '󰒓 ',
-              key = 'c',
-              desc = 'Config',
-              action = function()
-                Snacks.picker.files({ cwd = vim.fn.stdpath('config') })
-              end,
-            },
-            { icon = '󰁯 ', key = 's', desc = 'Restore Session', section = 'session' },
-            { icon = '󰒲 ', key = 'L', desc = 'Lazy', action = ':Lazy', enabled = package.loaded.lazy ~= nil },
-            { icon = '󰗼 ', key = 'q', desc = 'Quit', action = ':qa' },
-          },
+          -- keys = {
+          --   {
+          --     icon = '󰈞 ',
+          --     key = 'f',
+          --     desc = 'Find Files (Frecency)',
+          --     action = function()
+          --       Snacks.picker.files({ frecency = true })
+          --     end,
+          --   },
+          --   { icon = '󰈔 ', key = 'n', desc = 'New File', action = ':ene | startinsert' },
+          --   {
+          --     icon = '󰱼 ',
+          --     key = 'g',
+          --     desc = 'Find Text',
+          --     action = function()
+          --       Snacks.picker.grep()
+          --     end,
+          --   },
+          --   {
+          --     icon = '󰋚 ',
+          --     key = 'r',
+          --     desc = 'Recent Files',
+          --     action = function()
+          --       Snacks.picker.recent()
+          --     end,
+          --   },
+          --   {
+          --     icon = '󰒓 ',
+          --     key = 'c',
+          --     desc = 'Config',
+          --     action = function()
+          --       Snacks.picker.files({ cwd = vim.fn.stdpath('config') })
+          --     end,
+          --   },
+          --   { icon = '󰁯 ', key = 's', desc = 'Restore Session', section = 'session' },
+          --   { icon = '󰒲 ', key = 'L', desc = 'Lazy', action = ':Lazy', enabled = package.loaded.lazy ~= nil },
+          --   { icon = '󰗼 ', key = 'q', desc = 'Quit', action = ':qa' },
+          -- },
         },
         sections = {
           { section = 'header' },

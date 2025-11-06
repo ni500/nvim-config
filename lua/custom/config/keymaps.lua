@@ -281,6 +281,10 @@ keymap('n', '<leader>N', function()
   Snacks.win({ file = vim.api.nvim_get_runtime_file('doc/news.txt', false)[1], width = 0.6, height = 0.6, wo = { spell = false, wrap = false, signcolumn = 'yes', statuscolumn = ' ', conceallevel = 3 } })
 end, { desc = 'Neovim News' })
 
--- Telescope keymaps
-keymap('n', '<leader>ff', '<cmd>Telescope frecency<CR>', { desc = '[F]ind [f]iles' })
-keymap('n', '<leader>sf', '<cmd>Telescope frecency<CR>', { desc = '[S]earch [F]iles (Frecency)' })
+-- File search keymaps with Snacks.picker
+keymap('n', '<leader>ff', function()
+  Snacks.picker.files({ frecency = true })
+end, { desc = '[F]ind [f]iles' })
+keymap('n', '<leader>sf', function()
+  Snacks.picker.files({ frecency = true })
+end, { desc = '[S]earch [F]iles (Frecency)' })
