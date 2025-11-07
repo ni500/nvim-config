@@ -46,28 +46,28 @@ local rtp = vim.opt.rtp
 rtp:prepend(lazypath)
 require('lazy').setup({
   'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
-  { -- getsigns: Adds git related signs to the gutter, as well as utilities for managing changes
-    'lewis6991/gitsigns.nvim',
-    opts = {
-      signs = {
-        add = { text = '+' },
-        change = { text = '∙' },
-        delete = { text = '-' },
-        topdelete = { text = '‾' },
-        changedelete = { text = '≈' },
-      },
-    },
-    config = function(_, opts)
-      require('gitsigns').setup(opts)
-
-      vim.api.nvim_set_hl(0, 'GitSignsAdd', { fg = '#26A269', bold = true })
-      vim.api.nvim_set_hl(0, 'GitSignsChange', { fg = '#E5A50A', bold = true })
-      vim.api.nvim_set_hl(0, 'GitSignsDelete', { fg = '#C01C28', bold = true })
-      vim.api.nvim_set_hl(0, 'GitSignsTopdelete', { fg = '#C01C28', bold = true })
-      vim.api.nvim_set_hl(0, 'GitSignsChangedelete', { fg = '#E5A50A', bold = true })
-      vim.api.nvim_set_hl(0, 'GitSignsUntracked', { fg = '#5E5C64' })
-    end,
-  },
+  -- { -- getsigns: Adds git related signs to the gutter, as well as utilities for managing changes
+  --   'lewis6991/gitsigns.nvim',
+  --   opts = {
+  --     signs = {
+  --       add = { text = '+' },
+  --       change = { text = '∙' },
+  --       delete = { text = '-' },
+  --       topdelete = { text = '‾' },
+  --       changedelete = { text = '≈' },
+  --     },
+  --   },
+  --   config = function(_, opts)
+  --     require('gitsigns').setup(opts)
+  --
+  --     vim.api.nvim_set_hl(0, 'GitSignsAdd', { fg = '#26A269', bold = true })
+  --     vim.api.nvim_set_hl(0, 'GitSignsChange', { fg = '#E5A50A', bold = true })
+  --     vim.api.nvim_set_hl(0, 'GitSignsDelete', { fg = '#C01C28', bold = true })
+  --     vim.api.nvim_set_hl(0, 'GitSignsTopdelete', { fg = '#C01C28', bold = true })
+  --     vim.api.nvim_set_hl(0, 'GitSignsChangedelete', { fg = '#E5A50A', bold = true })
+  --     vim.api.nvim_set_hl(0, 'GitSignsUntracked', { fg = '#5E5C64' })
+  --   end,
+  -- },
   { -- whick-key: Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
@@ -456,6 +456,6 @@ require('lazy').setup({
   require('kickstart.plugins.debug'),
   require('kickstart.plugins.lint'),
   require('kickstart.plugins.autopairs'),
-  require('kickstart.plugins.gitsigns'), -- adds gitsigns recommend keymaps
+  -- require('kickstart.plugins.gitsigns'), -- adds gitsigns recommend keymaps
   { import = 'custom.plugins' },
 }, {})
