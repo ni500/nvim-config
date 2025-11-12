@@ -102,7 +102,7 @@ keymap('n', '<leader>fp', function()
   Snacks.picker.projects()
 end, { desc = 'Projects' })
 keymap('n', '<leader>fr', function()
-  Snacks.picker.recent()
+  Snacks.picker.recent({ filter = { cwd = true } })
 end, { desc = 'Recent' })
 -- git
 keymap('n', '<leader>gb', function()
@@ -228,6 +228,10 @@ end, { desc = 'LSP Symbols' })
 keymap('n', '<leader>sS', function()
   Snacks.picker.lsp_workspace_symbols()
 end, { desc = 'LSP Workspace Symbols' })
+-- Code Actions (like Cmd+. in Cursor)
+keymap({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, { desc = '[C]ode [A]ction' })
+-- Show diagnostic in floating window
+keymap('n', '<leader>cd', vim.diagnostic.open_float, { desc = '[C]ode [D]iagnostic' })
 -- File Explorer
 keymap('n', '<leader>e', function()
   Snacks.explorer()
@@ -288,3 +292,15 @@ end, { desc = '[F]ind [f]iles' })
 keymap('n', '<leader>sf', function()
   Snacks.picker.files({ frecency = true })
 end, { desc = '[S]earch [F]iles (Frecency)' })
+
+-- macOS-style text editing in insert mode
+keymap('i', '<D-BS>', '<C-u>', { desc = 'Delete to start of line' }) -- Cmd+Backspace
+keymap('i', '<M-BS>', '<C-w>', { desc = 'Delete word backward' }) -- Option+Backspace
+keymap('i', '<D-Delete>', '<C-o>D', { desc = 'Delete to end of line' }) -- Cmd+Delete (if you have Del key)
+
+-- macOS-style text selection in insert mode
+-- Character selection
+keymap('i', '<S-Left>', '<Esc>vh', { desc = 'Select char left' })
+keymap('i', '<S-Right>', '<Esc>vl', { desc = 'Select char right' })
+keymap('i', '<S-Up>', '<Esc>vk', { desc = 'Select line up' })
+keymap('i', '<S-Down>', '<Esc>vj', { desc = 'Select line down' })

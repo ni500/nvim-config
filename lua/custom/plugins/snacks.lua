@@ -5,7 +5,7 @@ return {
     lazy = false,
     ---@type snacks.Config
     opts = {
-      bigfile = { enabled = true },
+      bigfile = { enabled = true }, -- Use default 1.5MB threshold
       dashboard = {
         enabled = true,
         preset = {
@@ -51,7 +51,7 @@ return {
         sections = {
           { section = 'header' },
           { icon = ' ', title = 'Keymaps', section = 'keys', indent = 2, padding = 1 },
-          { icon = ' ', title = 'Recent Files', section = 'recent_files', indent = 2, padding = 1 },
+          { icon = ' ', title = 'Recent Files', section = 'recent_files', cwd = true, indent = 2, padding = 1 },
           { icon = ' ', title = 'Projects', section = 'projects', indent = 2, padding = 1 },
           { section = 'startup' },
         },
@@ -74,6 +74,7 @@ return {
       input = { enabled = true },
       picker = {
         enabled = true,
+        hidden = true, -- Show hidden files (dotfiles)
         formatters = {
           file = {
             filename_first = true,

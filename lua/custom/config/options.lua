@@ -31,3 +31,6 @@ vim.o.tabstop = 2
 vim.o.shiftwidth = 2
 vim.o.expandtab = true
 vim.o.softtabstop = 2
+
+-- Performance optimizations for large files/projects
+vim.o.updatetime = 300 -- Slightly increased from 250ms for better performance

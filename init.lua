@@ -107,8 +107,8 @@ require('lazy').setup({
           variant = 'auto',
           override = {
             zsh = {
-              icon = '',
-              color = '#428850',
+              icon = ' ',
+              color = '#91C848',
               cterm_color = '65',
               name = 'Zsh',
             },
@@ -167,6 +167,7 @@ require('lazy').setup({
   },
   { -- nvim-lspconfig: Main LSP Configuration
     'neovim/nvim-lspconfig',
+    event = { 'BufReadPre', 'BufNewFile' }, -- Load before file opens for proper highlighting
     dependencies = {
       -- Mason must be loaded before its dependents so we need to set it up here.
       { 'mason-org/mason.nvim', opts = {} },
@@ -176,6 +177,47 @@ require('lazy').setup({
       'saghen/blink.cmp', -- Allows extra capabilities provided by blink.cmp
     },
     config = function()
+      -- FIRST: Block ts_ls and html LSP from attaching in Angular projects
+      vim.api.nvim_create_autocmd('LspAttach', {
+        group = vim.api.nvim_create_augroup('block-lsp-in-angular', { clear = true }),
+        callback = function(event)
+          local client = vim.lsp.get_client_by_id(event.data.client_id)
+          if not client then
+            return
+          end
+
+          local util = require('lspconfig.util')
+          local bufname = vim.api.nvim_buf_get_name(event.buf)
+          local is_angular = util.root_pattern('nx.json', 'angular.json', 'project.json')(bufname)
+
+          if is_angular then
+            -- Block ts_ls - angularls handles TypeScript
+            if client.name == 'ts_ls' then
+              vim.lsp.stop_client(client.id)
+              return
+            end
+
+            -- Block html LSP for Angular template files - angularls handles HTML templates
+            if client.name == 'html' then
+              local ft = vim.bo[event.buf].filetype
+              if ft == 'html' or ft == 'htmlangular' then
+                vim.lsp.stop_client(client.id)
+                return
+              end
+            end
+
+            -- Block emmet_ls for Angular templates - too heavy, angularls provides completion
+            if client.name == 'emmet_ls' then
+              local ft = vim.bo[event.buf].filetype
+              if ft == 'html' or ft == 'htmlangular' then
+                vim.lsp.stop_client(client.id)
+                return
+              end
+            end
+          end
+        end,
+      })
+
       vim.api.nvim_create_autocmd('LspAttach', {
         group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
         callback = function(event)
@@ -240,9 +282,10 @@ require('lazy').setup({
         end,
       })
 
-      -- Diagnostic Config
+      -- Diagnostic Config (Performance optimized)
       -- See :help vim.diagnostic.Opts
       vim.diagnostic.config({
+        update_in_insert = false, -- Don't update diagnostics while typing (big performance boost)
         severity_sort = true,
         float = { border = 'rounded', source = 'if_many' },
         underline = { severity = vim.diagnostic.severity.ERROR },
@@ -270,32 +313,58 @@ require('lazy').setup({
       })
       local capabilities = require('blink.cmp').get_lsp_capabilities()
       local servers = {
-        pyright = {},
-        ts_ls = {},
-        angularls = { -- Add this
-          filetypes = { 'typescript', 'html', 'typescriptangular', 'typescript.tsx' },
+        ts_ls = {}, -- TypeScript/JavaScript (disabled in Angular projects via custom handler)
+        angularls = {
+          filetypes = { 'typescript', 'html', 'typescriptreact', 'typescript.tsx', 'htmlangular' },
           root_dir = require('lspconfig.util').root_pattern('nx.json', 'angular.json', 'project.json', '.git'),
+          -- Aggressive performance optimizations for large Nx monorepos
+          on_attach = function(client, bufnr)
+            -- Disable semantic tokens for faster startup
+            client.server_capabilities.semanticTokensProvider = nil
+            -- Disable document formatting (use prettier via conform instead)
+            client.server_capabilities.documentFormattingProvider = false
+            client.server_capabilities.documentRangeFormattingProvider = false
+            -- Disable hover for HTML files (reduces overhead on large templates)
+            if vim.bo[bufnr].filetype == 'html' or vim.bo[bufnr].filetype == 'htmlangular' then
+              client.server_capabilities.hoverProvider = false
+            end
+          end,
+          -- Performance settings for Angular LS
+          init_options = {
+            enableIvy = true,
+            strictTemplates = false,
+            forceStrictTemplates = false,
+          },
+          flags = {
+            debounce_text_changes = 500, -- Higher debounce for large HTML templates
+          },
         },
-        html = {},
-        cssls = {},
-        emmet_ls = {
-          filetypes = { 'html', 'typescript', 'javascript', 'css', 'scss', 'saas' },
+        tailwindcss = {
+          on_attach = function(client, bufnr)
+            -- Disable hover in HTML files (tailwind info is heavy)
+            if vim.bo[bufnr].filetype == 'html' or vim.bo[bufnr].filetype == 'htmlangular' then
+              client.server_capabilities.hoverProvider = false
+            end
+          end,
+          flags = {
+            debounce_text_changes = 500,
+          },
+        },
+        cssmodules_ls = {
+          flags = {
+            debounce_text_changes = 500,
+          },
         },
         lua_ls = {
-          settings = {
-            Lua = {
-              completion = {
-                callSnippet = 'Replace',
-              },
-            },
-          },
+          settings = { Lua = { completion = { callSnippet = 'Replace' } } },
         },
       }
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
-        'angular-language-server', -- Add this
-        'eslint-lsp', -- Add this for your linting
+        'angular-language-server',
+        'eslint-lsp',
+        'prettier', -- TypeScript/HTML/CSS formatter
       })
       require('mason-tool-installer').setup({ ensure_installed = ensure_installed })
       require('mason-lspconfig').setup({
@@ -306,6 +375,31 @@ require('lazy').setup({
             local server = servers[server_name] or {}
             server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
             require('lspconfig')[server_name].setup(server)
+          end,
+          -- Special handler for ts_ls to completely disable it in Angular/Nx projects
+          -- This works for ALL Angular projects by checking for marker files
+          ts_ls = function()
+            -- Check if current working directory or any parent has Angular markers
+            local util = require('lspconfig.util')
+            local cwd = vim.fn.getcwd()
+            local is_angular = util.root_pattern('nx.json', 'angular.json', 'project.json')(cwd)
+
+            print('[DEBUG] ts_ls handler called, cwd:', cwd)
+            print('[DEBUG] is_angular:', is_angular)
+
+            if is_angular then
+              -- Don't setup ts_ls at all in Angular projects
+              print('[BLOCKED] ts_ls disabled in Angular/Nx project: ' .. is_angular)
+              vim.notify('ts_ls BLOCKED in Angular project: ' .. is_angular, vim.log.levels.WARN)
+              -- Do NOT call setup at all
+              return
+            end
+
+            -- Setup ts_ls normally for non-Angular projects
+            print('[ALLOWED] ts_ls allowed in non-Angular project')
+            local server = servers.ts_ls or {}
+            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+            require('lspconfig').ts_ls.setup(server)
           end,
         },
       })
@@ -332,14 +426,24 @@ require('lazy').setup({
         if disable_filetypes[vim.bo[bufnr].filetype] then
           return nil
         else
+          -- Use longer timeout for TypeScript/Angular files
+          local timeout = vim.bo[bufnr].filetype == 'typescript' and 2000 or 500
           return {
-            timeout_ms = 500,
+            timeout_ms = timeout,
             lsp_format = 'fallback',
           }
         end
       end,
       formatters_by_ft = {
         lua = { 'stylua' },
+        typescript = { 'prettier' },
+        typescriptreact = { 'prettier' },
+        javascript = { 'prettier' },
+        javascriptreact = { 'prettier' },
+        html = { 'prettier' },
+        css = { 'prettier' },
+        scss = { 'prettier' },
+        json = { 'prettier' },
       },
     },
   },
@@ -443,7 +547,9 @@ require('lazy').setup({
         'regex',
         'css',
         'scss',
+        'typescript',
         'tsx',
+        'javascript',
       },
       auto_install = true,
       highlight = {
@@ -451,6 +557,7 @@ require('lazy').setup({
         additional_vim_regex_highlighting = { 'ruby' },
       },
       indent = { enable = true, disable = { 'ruby' } },
+      fold = { enable = true },
     },
   },
   require('kickstart.plugins.debug'),
