@@ -275,6 +275,7 @@ end, { desc = 'Toggle Terminal' })
 keymap('n', '<c-_>', function()
   Snacks.terminal()
 end, { desc = 'which_key_ignore' })
+
 keymap({ 'n', 't' }, ']]', function()
   Snacks.words.jump(vim.v.count1)
 end, { desc = 'Next Reference' })
@@ -304,3 +305,8 @@ keymap('i', '<S-Left>', '<Esc>vh', { desc = 'Select char left' })
 keymap('i', '<S-Right>', '<Esc>vl', { desc = 'Select char right' })
 keymap('i', '<S-Up>', '<Esc>vk', { desc = 'Select line up' })
 keymap('i', '<S-Down>', '<Esc>vj', { desc = 'Select line down' })
+
+-- Exit terminal mode without <Esc> for claude code compatibility
+keymap('t', 'jk', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
+keymap('i', 'jj', '<Esc>', { noremap = false })
+keymap('i', 'jk', '<Esc>', { noremap = false })
