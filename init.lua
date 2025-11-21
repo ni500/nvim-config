@@ -81,6 +81,7 @@ require('lazy').setup({
         { '<leader>s', group = '[S]earch' },
         { '<leader>t', group = '[T]oggle' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+        { '<leader>c', group = '[C]ode', mode = { 'n', 'v' } },
       },
     },
   },
@@ -232,6 +233,13 @@ require('lazy').setup({
           map('gra', vim.lsp.buf.code_action, '[G]oto Code [A]ction', { 'n', 'x' })
           -- This is not Goto Definition, this is Goto Declaration.
           map('grD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+
+          -- Hover Documentation
+          map('K', vim.lsp.buf.hover, 'Hover Documentation')
+
+          -- Signature Help
+          map('<C-k>', vim.lsp.buf.signature_help, 'Signature Help')
+
           -- NOTE: Telescope LSP navigation keymaps removed - using Snacks.picker instead
           -- LSP navigation now handled by Snacks.picker (gd, gr, gI, gD, gy)
           -- See lua/custom/plugins/snacks.lua for LSP keymaps
