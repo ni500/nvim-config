@@ -104,6 +104,9 @@ end, { desc = 'Projects' })
 keymap('n', '<leader>fr', function()
   Snacks.picker.recent({ filter = { cwd = true } })
 end, { desc = 'Recent' })
+keymap('n', '<leader>fF', function()
+  Snacks.picker.files({ matcher = { frecency = false } })
+end, { desc = 'Find Files (Alphabetical)' })
 -- git
 keymap('n', '<leader>gb', function()
   Snacks.picker.git_branches()
@@ -288,11 +291,11 @@ end, { desc = 'Neovim News' })
 
 -- File search keymaps with Snacks.picker
 keymap('n', '<leader>ff', function()
-  Snacks.picker.files({ frecency = true })
-end, { desc = '[F]ind [f]iles' })
+  Snacks.picker.files()
+end, { desc = '[F]ind [F]iles' })
 keymap('n', '<leader>sf', function()
-  Snacks.picker.files({ frecency = true })
-end, { desc = '[S]earch [F]iles (Frecency)' })
+  Snacks.picker.files()
+end, { desc = '[S]earch [F]iles' })
 
 -- macOS-style text editing in insert mode
 keymap('i', '<D-BS>', '<C-u>', { desc = 'Delete to start of line' }) -- Cmd+Backspace

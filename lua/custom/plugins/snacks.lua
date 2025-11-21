@@ -75,6 +75,10 @@ return {
       picker = {
         enabled = true,
         hidden = true, -- Show hidden files (dotfiles)
+        matcher = {
+          frecency = true,
+          sort_empty = true, -- Sort by frecency even when filter is empty
+        },
         formatters = {
           file = {
             filename_first = true,
