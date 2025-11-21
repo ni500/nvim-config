@@ -74,7 +74,11 @@ return {
       input = { enabled = true },
       picker = {
         enabled = true,
-        hidden = true, -- Show hidden files (dotfiles)
+        sources = {
+          files = {
+            hidden = true, -- Show hidden files/folders (dotfiles)
+          },
+        },
         matcher = {
           frecency = true,
           sort_empty = true, -- Sort by frecency even when filter is empty
